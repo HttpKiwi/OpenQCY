@@ -22,6 +22,11 @@ SOFTWARE.
 
 ---
 
-This application implements the QCY BLE GATT protocol documented by Quicky
-(https://github.com/hui1601/Quicky, copyright hui1601). Quicky is not
-included in this repository and is subject to its own license.
+## Third-party protocol documentation
+
+This application implements a QCY BLE GATT client based on protocol information
+published in Quicky (https://github.com/hui1601/Quicky) by hui1601.
+
+Quicky is not included in this repository. The Quicky repository currently has
+no LICENSE file; it is not distributed here and is not licensed under MIT.
+See README.md for attribution and licensing notes.

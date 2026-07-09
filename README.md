@@ -22,7 +22,6 @@ Not affiliated with QCY. Use at your own risk.
 ## Build
 
 ```bash
-cd melo_control
 flutter pub get
 flutter build apk --release
 ```
@@ -42,9 +41,9 @@ adb install -r build/app/outputs/flutter-apk/app-release.apk
 
 ## Protocol & credits
 
-The BLE command protocol, GATT layout, and product database used by this app come from **[Quicky](https://github.com/hui1601/Quicky)** by [**hui1601**](https://github.com/hui1601).
+The BLE command protocol, GATT layout, and product database used by this app are based on **[Quicky](https://github.com/hui1601/Quicky)** by [**hui1601**](https://github.com/hui1601).
 
-Quicky reverse-engineered QCY earphone traffic and documents 40+ commands (ANC, EQ, key functions, battery, and more). Melo Control is a separate Flutter client built on that work — not a fork of the Quicky Go library.
+Quicky reverse-engineered QCY earphone traffic and documents 40+ commands (ANC, EQ, key functions, battery, and more). Melo Control is a separate Flutter client that reimplements that protocol in Dart — it is **not** a fork of Quicky and does **not** include Quicky source code.
 
 | Resource | Link |
 |----------|------|
@@ -54,8 +53,14 @@ Quicky reverse-engineered QCY earphone traffic and documents 40+ commands (ANC, 
 
 Thank you to **hui1601** for publishing Quicky and the protocol documentation.
 
+### Quicky licensing note
+
+As of this writing, the [Quicky repository](https://github.com/hui1601/Quicky) does **not** include a `LICENSE` file. That means Quicky is **not** under an open-source license by default — standard copyright applies, and only the copyright holder grants permission to use their work.
+
+This project documents its dependency on Quicky’s **public protocol write-up** for interoperability and gives attribution. It does **not** copy Quicky’s Go source into this repository. If you redistribute or build on Quicky itself, check with hui1601 or wait for an explicit license on that repo.
+
 ## License
 
-Melo Control app source: MIT (see [LICENSE](LICENSE)).
+**OpenQCY / Melo Control** (this repository): [MIT](LICENSE) — Copyright (c) 2026 httpkiwi.
 
-Quicky remains under its own license in the [Quicky repository](https://github.com/hui1601/Quicky). This project does not bundle Quicky; it reimplements the client protocol in Dart for Flutter.
+Quicky is a separate project; see the note above.
