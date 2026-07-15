@@ -1,0 +1,105 @@
+name: Build & Publish APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: build-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+env:
+  FLUTTER_VERSION: "3.44.5"
+  HAS_RELEASE_SIGNING: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+
+jobs:
+  build:
+    name: Build release APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
+      - name: Configure release signing
+        if: ${{ env.HAS_RELEASE_SIGNING == 'true' }}
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/app/release.keystore
+          cat > android/key.properties <<EOF
+          storeFile=release.keystore
+          keyAlias=$ANDROID_KEY_ALIAS
+          keyPassword=$ANDROID_KEY_PASSWORD
+          storePassword=$ANDROID_STORE_PASSWORD
+          EOF
+          echo "Release keystore configured."
+
+      - name: Read app version
+        id: version
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version:[[:space:]]*//' | tr -d '[:space:]')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "App version: $VERSION"
+
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Rename APK
+        run: |
+          mkdir -p dist
+          cp build/app/outputs/flutter-apk/app-release.apk \
+             "dist/OpenQCY-v${{ steps.version.outputs.version }}.apk"
+          cp build/app/outputs/flutter-apk/app-release.apk \
+             dist/OpenQCY-latest.apk
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: openqcy-apk
+          path: dist/*.apk
+          if-no-files-found: error
+
+      - name: Publish rolling release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: "OpenQCY latest (build ${{ github.run_number }})"
+          body: |
+            Automated build from `main` @ ${{ github.sha }}.
+
+            App version: **${{ steps.version.outputs.version }}**
+
+            Download `OpenQCY-latest.apk` below and sideload it on Android.
+          prerelease: true
+          files: dist/*.apk
+          fail_on_unmatched_files: true

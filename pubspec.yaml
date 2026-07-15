@@ -1,5 +1,5 @@
 name: melo_control
-description: Control QCY MeloBuds and compatible earbuds over BLE.
+description: OpenQCY — control QCY MeloBuds and compatible earbuds over BLE.
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -26,3 +26,4 @@ flutter:
   uses-material-design: true
   assets:
     - assets/icon/app_icon.png
+    - assets/icon/earbuds.svg

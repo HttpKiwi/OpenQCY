@@ -1,8 +1,10 @@
+import '../core/qcy/advertisement.dart';
+
 class BatteryLevels {
   const BatteryLevels({
     required this.left,
     required this.right,
-    required this.caseLevel,
+    this.caseLevel,
     this.leftCharging = false,
     this.rightCharging = false,
     this.caseCharging = false,
@@ -10,23 +12,64 @@ class BatteryLevels {
 
   final int left;
   final int right;
-  final int caseLevel;
+  final int? caseLevel;
   final bool leftCharging;
   final bool rightCharging;
   final bool caseCharging;
 
-  static BatteryLevels fromBytes(List<int> data) {
-    if (data.length < 3) {
-      return const BatteryLevels(left: 0, right: 0, caseLevel: 0);
-    }
+  bool get hasCase => caseLevel != null;
+
+  factory BatteryLevels.fromAdvertisement(QcyAdvertisement adv) {
     return BatteryLevels(
-      left: data[0] & 0x7F,
-      right: data[1] & 0x7F,
-      caseLevel: data[2] & 0x7F,
-      leftCharging: data[0] & 0x80 != 0,
-      rightCharging: data[1] & 0x80 != 0,
-      caseCharging: data[2] & 0x80 != 0,
+      left: adv.leftBattery,
+      right: adv.rightBattery,
+      caseLevel: _validCaseLevel(adv.boxBattery),
+      leftCharging: adv.leftCharging,
+      rightCharging: adv.rightCharging,
+      caseCharging: adv.boxCharging,
     );
+  }
+
+  static BatteryLevels fromBytes(List<int> data) {
+    if (data.isEmpty) {
+      return const BatteryLevels(left: 0, right: 0);
+    }
+
+    return BatteryLevels(
+      left: _budLevel(data[0]),
+      right: data.length > 1 ? _budLevel(data[1]) : 0,
+      caseLevel: data.length > 2 ? _validCaseLevel(_budLevel(data[2])) : null,
+      leftCharging: data[0] & 0x80 != 0,
+      rightCharging: data.length > 1 && data[1] & 0x80 != 0,
+      caseCharging: data.length > 2 && data[2] & 0x80 != 0,
+    );
+  }
+
+  /// Prefer live GATT/notify levels but keep case % from scan when the device
+  /// omits it (common on MeloBuds Pro when buds are out of the case).
+  BatteryLevels mergedWith(
+    QcyAdvertisement adv, {
+    BatteryLevels? keepCaseFrom,
+  }) {
+    final mergedCase =
+        caseLevel ?? keepCaseFrom?.caseLevel ?? _validCaseLevel(adv.boxBattery);
+    final caseFromAdv = mergedCase == _validCaseLevel(adv.boxBattery);
+
+    return BatteryLevels(
+      left: left,
+      right: right,
+      caseLevel: mergedCase,
+      leftCharging: leftCharging,
+      rightCharging: rightCharging,
+      caseCharging: caseCharging || (caseFromAdv && adv.boxCharging),
+    );
+  }
+
+  static int _budLevel(int byte) => byte & 0x7F;
+
+  static int? _validCaseLevel(int raw) {
+    if (raw <= 0 || raw > 100) return null;
+    return raw;
   }
 }
 

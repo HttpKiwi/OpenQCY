@@ -1,6 +1,6 @@
 {
-    "name": "melo_control",
-    "short_name": "melo_control",
+    "name": "OpenQCY",
+    "short_name": "OpenQCY",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

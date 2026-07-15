@@ -45,6 +45,11 @@ app.*.map.json
 /android/app/release
 /android/local.properties
 
+# Release signing (never commit keystores or their passwords)
+/android/key.properties
+**/*.keystore
+**/*.jks
+
 # Local / generated
 *.apk
 *.aab

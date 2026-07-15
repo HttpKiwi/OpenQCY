@@ -1,4 +1,4 @@
-# Melo Control
+# OpenQCY
 
 Unofficial Flutter app to control **QCY MeloBuds Pro** (and other QCY earbuds with matching vendor IDs) over BLE GATT on Android.
 
@@ -43,7 +43,7 @@ adb install -r build/app/outputs/flutter-apk/app-release.apk
 
 The BLE command protocol, GATT layout, and product database used by this app are based on **[Quicky](https://github.com/hui1601/Quicky)** by [**hui1601**](https://github.com/hui1601).
 
-Quicky reverse-engineered QCY earphone traffic and documents 40+ commands (ANC, EQ, key functions, battery, and more). Melo Control is a separate Flutter client that reimplements that protocol in Dart — it is **not** a fork of Quicky and does **not** include Quicky source code.
+Quicky reverse-engineered QCY earphone traffic and documents 40+ commands (ANC, EQ, key functions, battery, and more). OpenQCY is a separate Flutter client that reimplements that protocol in Dart — it is **not** a fork of Quicky and does **not** include Quicky source code.
 
 | Resource | Link |
 |----------|------|
@@ -61,6 +61,6 @@ This project documents its dependency on Quicky’s **public protocol write-up**
 
 ## License
 
-**OpenQCY / Melo Control** (this repository): [MIT](LICENSE) — Copyright (c) 2026 httpkiwi.
+**OpenQCY** (this repository): [MIT](LICENSE) — Copyright (c) 2026 httpkiwi.
 
 Quicky is a separate project; see the note above.

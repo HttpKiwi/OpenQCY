@@ -175,6 +175,7 @@ class BleController extends ChangeNotifier {
     _session = DeviceSession(
       device: device,
       phase: ConnectionPhase.connecting,
+      battery: BatteryLevels.fromAdvertisement(device.advertisement),
       statusMessage: 'Connecting…',
     );
     notifyListeners();
@@ -468,8 +469,12 @@ class BleController extends ChangeNotifier {
         settings = settings.copyWith(
           keyFunctions: parseKeyFunctionData(cmd.params),
         );
-      } else if (cmd.opcode == 0x2f && cmd.params.length >= 3) {
-        battery = BatteryLevels.fromBytes(cmd.params);
+      } else if (cmd.opcode == 0x2f && cmd.params.isNotEmpty) {
+        final incoming = BatteryLevels.fromBytes(cmd.params);
+        battery = incoming.mergedWith(
+          _session!.device.advertisement,
+          keepCaseFrom: battery,
+        );
       }
     }
 
@@ -495,7 +500,8 @@ class BleController extends ChangeNotifier {
     await syncKeyFunctionsFromDevice();
 
     const opcodes = [
-      0x09, 0x10, 0x06, 0x23, 0x24, 0x2d, 0x08, 0x16, 0x17, 0x0c, 0x14, 0x2b,
+      0x2f, 0x09, 0x10, 0x06, 0x23, 0x24, 0x2d, 0x08, 0x16, 0x17, 0x0c, 0x14,
+      0x2b,
     ];
     for (final op in opcodes) {
       try {
@@ -587,9 +593,14 @@ class BleController extends ChangeNotifier {
 
   Future<BatteryLevels?> readBattery() async {
     final char = _batteryChar;
-    if (char == null) return null;
+    final adv = _session?.device.advertisement;
+    if (char == null) {
+      return adv != null ? BatteryLevels.fromAdvertisement(adv) : null;
+    }
     final data = await char.read();
-    return BatteryLevels.fromBytes(data);
+    final parsed = BatteryLevels.fromBytes(data);
+    if (adv == null) return parsed;
+    return parsed.mergedWith(adv, keepCaseFrom: _session?.battery);
   }
 
   Future<FirmwareVersion?> readFirmware() async {

@@ -543,12 +543,13 @@ class _BatteryCard extends StatelessWidget {
                     level: battery!.right,
                     charging: battery!.rightCharging,
                   ),
-                  BatteryRing(
-                    label: 'Case',
-                    level: battery!.caseLevel,
-                    charging: battery!.caseCharging,
-                    icon: Icons.inventory_2_outlined,
-                  ),
+                  if (battery!.hasCase)
+                    BatteryRing(
+                      label: 'Case',
+                      level: battery!.caseLevel!,
+                      charging: battery!.caseCharging,
+                      icon: Icons.inventory_2_outlined,
+                    ),
                 ],
               ),
       ),

@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 
     <application
-        android:label="Melo Control"
+        android:label="OpenQCY"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

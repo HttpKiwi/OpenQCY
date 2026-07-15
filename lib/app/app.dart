@@ -72,7 +72,7 @@ class MeloControlApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
     return MaterialApp.router(
-      title: 'Melo Control',
+      title: 'OpenQCY',
       debugShowCheckedModeBanner: false,
       theme: buildAppTheme(brightness: Brightness.light),
       darkTheme: buildAppTheme(brightness: Brightness.dark),

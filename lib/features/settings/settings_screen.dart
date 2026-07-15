@@ -46,7 +46,7 @@ class SettingsScreen extends ConsumerWidget {
             ),
           const Divider(),
           ListTile(
-            title: const Text('About Melo Control'),
+            title: const Text('About OpenQCY'),
             subtitle: const Text(
               'Unofficial QCY earbud controller via BLE GATT.\n'
               'Based on the Quicky protocol.\n'

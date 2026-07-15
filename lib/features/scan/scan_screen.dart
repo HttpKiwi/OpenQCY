@@ -110,7 +110,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Melo Control'),
+        title: const Text('OpenQCY'),
         centerTitle: false,
         actions: [
           IconButton(
@@ -264,7 +264,9 @@ class _DeviceCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      'L ${adv.leftBattery}% · R ${adv.rightBattery}% · Case ${adv.boxBattery}%',
+                      adv.boxBattery > 0 && adv.boxBattery <= 100
+                          ? 'L ${adv.leftBattery}% · R ${adv.rightBattery}% · Case ${adv.boxBattery}%'
+                          : 'L ${adv.leftBattery}% · R ${adv.rightBattery}%',
                       style: Theme.of(context).textTheme.labelLarge,
                     ),
                   ],
