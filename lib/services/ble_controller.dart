@@ -51,6 +51,18 @@ class BleController extends ChangeNotifier {
   SavedDevice? get lastDevice => _prefs?.lastDevice;
   bool get autoReconnect => _prefs?.autoReconnect ?? true;
 
+  bool _autoConnectConsumed = false;
+
+  /// Returns the only nearby QCY device, once per app run, so the scan screen
+  /// can skip the selection step. Later visits to the scan screen (after the
+  /// user disconnects or goes back) never auto-connect again.
+  DiscoveredDevice? takeAutoConnectCandidate() {
+    if (_autoConnectConsumed) return null;
+    _autoConnectConsumed = true;
+    if (!autoReconnect || _devices.length != 1) return null;
+    return _devices.first;
+  }
+
   Future<void> initPrefs() async {
     _prefs ??= await DevicePrefs.load();
   }
