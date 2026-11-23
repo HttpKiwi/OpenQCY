@@ -30,7 +30,11 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
     final ble = ref.read(bleControllerProvider);
     await ble.initPrefs();
     await _scan();
-    if (ble.autoReconnect && ble.lastDevice != null && mounted) {
+    if (!mounted) return;
+    final only = ble.takeAutoConnectCandidate();
+    if (only != null) {
+      await _connect(only);
+    } else if (ble.autoReconnect && ble.lastDevice != null) {
       setState(() {});
     }
   }
